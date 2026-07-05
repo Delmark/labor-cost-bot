@@ -5,6 +5,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,28 +51,47 @@ public class MessageCommandExecutor {
                     
                     Для получения общей информации по своим трудозатратам введите /info.
                     """;
-            SendMessage messageRequest = new SendMessage(message.chat().id(), responseText);
-
-            InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText("Информация по трудозатратам");
-            button.setCallbackData("labor_cost_info");
-
-            messageRequest.setReplyMarkup(new InlineKeyboardMarkup(button));
+            long chatId = message.chat().id();
+            SendMessage messageRequest = new SendMessage(chatId, responseText)
+                    .replyMarkup(new InlineKeyboardMarkup(
+                            new InlineKeyboardButton("Информация по трудозатратам").callbackData(Callbacks.INFO)));
             bot.execute(messageRequest);
         };
     }
 
     private Consumer<Message> infoCommand() {
         return message -> {
+            long chatId = message.chat().id();
             try {
-                CollectedInfo info = portalDataAggregator.collectInfoMessage();
-                SendMessage messageRequest = new SendMessage(message.chat().id(), info.message());
-                bot.execute(messageRequest);
+                sendInfo(chatId);
             } catch (Exception e) {
                 log.error("Failed to collect labor cost info", e);
-                bot.execute(new SendMessage(message.chat().id(),
+                bot.execute(new SendMessage(chatId,
                         "Не удалось получить данные с портала. Попробуйте позже."));
             }
         };
+    }
+
+    public void sendInfo(long chatId) {
+        CollectedInfo info = portalDataAggregator.collectInfoMessage();
+        SendMessage request = new SendMessage(chatId, info.message());
+        if (info.needToFill()) {
+            request.replyMarkup(fillKeyboard());
+        }
+        bot.execute(request);
+    }
+
+    public void editToInfo(long chatId, Integer messageId) {
+        CollectedInfo info = portalDataAggregator.collectInfoMessage();
+        EditMessageText request = new EditMessageText(chatId, messageId, info.message());
+        if (info.needToFill()) {
+            request.replyMarkup(fillKeyboard());
+        }
+        bot.execute(request);
+    }
+
+    private InlineKeyboardMarkup fillKeyboard() {
+        return new InlineKeyboardMarkup(
+                new InlineKeyboardButton("Проставить дни").callbackData(Callbacks.FILL));
     }
 }

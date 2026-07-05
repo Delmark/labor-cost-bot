@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -20,4 +21,5 @@ public class AggregatedPortalData {
     List<Day> daysToFill;
     LaborRank rank;
     List<FavoriteProject> favoriteProjects;
+    UUID employeeId;
 }

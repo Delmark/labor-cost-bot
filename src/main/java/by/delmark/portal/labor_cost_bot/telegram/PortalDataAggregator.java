@@ -9,12 +9,9 @@ import by.delmark.portal.labor_cost_bot.telegram.dto.AggregatedPortalData;
 import by.delmark.portal.labor_cost_bot.telegram.dto.CollectedInfo;
 import by.delmark.portal.labor_cost_bot.telegram.dto.LaborRank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.web.format.DateTimeFormatters;
-import org.springframework.format.datetime.DateFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +19,6 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -62,51 +58,41 @@ public class PortalDataAggregator {
                 .daysToFill(uncompletedDays)
                 .rank(LaborRank.getLaborRank(uncompletedDays.size()))
                 .favoriteProjects(favoriteProjects)
+                .employeeId(employeeId)
                 .build();
     }
 
     public CollectedInfo collectInfoMessage() {
         AggregatedPortalData data = getAggregatedPortalData();
         StringBuilder responseText = new StringBuilder();
-        responseText.append("Текущая информация по трудозатратам:");
+        responseText.append("Текущая информация по трудозатратам:\n");
 
         List<Day> daysToFill = data.getDaysToFill();
         if (daysToFill.isEmpty()) {
-            responseText.append(
-                    "У вас нет незаполненный дней! Идеально!.\n\nВаш ранг: %s"
-                            .formatted(data.getRank().getAlias())
-            );
+            responseText.append("\nУ вас нет незаполненных дней! Идеально!");
+            responseText.append("\n\nВаш ранг: %s".formatted(data.getRank().getAlias()));
             return new CollectedInfo(responseText.toString(), false);
         }
 
         int uncompleted = daysToFill.size();
-        responseText.append("В данный момент незаполненно %d дней".formatted(uncompleted));
+        responseText.append("\nНезаполненных дней: %d".formatted(uncompleted));
         if (uncompleted < 5) {
-            responseText.append("\nНеобходимо заполнить ТРЗ на следующие дни:");
+            responseText.append("\n\nНеобходимо заполнить ТРЗ на следующие дни:");
             daysToFill.forEach(day -> responseText
-                    .append("\n")
+                    .append("\n• ")
                     .append(DayOfWeek.of(day.getDayOfWeekNumber())
-                            .getDisplayName(
-                                    TextStyle.FULL_STANDALONE,
-                                    Locale.of("ru")
-                            )
-                    )
-                    .append(" ")
+                            .getDisplayName(TextStyle.FULL_STANDALONE, Locale.of("ru")))
+                    .append(", ")
                     .append(dateFormat.format(day.getDayDate())));
         } else {
-            List<String> uncompletedPeriods = generateDatePeriods(daysToFill);
-            responseText.append("\nНеобходимо заполнить ТРЗ на следующие периоды:");
-            StringJoiner joiner = new StringJoiner("\n");
-            uncompletedPeriods.forEach(joiner::add);
-            responseText.append(joiner);
+            responseText.append("\n\nНеобходимо заполнить ТРЗ на следующие периоды:");
+            generateDatePeriods(daysToFill).forEach(period -> responseText.append("\n• ").append(period));
         }
 
         List<FavoriteProject> projects = data.getFavoriteProjects();
         if (!CollectionUtils.isEmpty(projects)) {
-            responseText.append("\n\nПроекты над которыми можно заполнить информацию из этого бота:");
-            StringJoiner joiner = new StringJoiner("\n");
-            projects.forEach(project -> joiner.add(project.getShortName()));
-            responseText.append(joiner);
+            responseText.append("\n\nПроекты, доступные для заполнения из бота:");
+            projects.forEach(project -> responseText.append("\n• ").append(project.getShortName()));
         }
 
         responseText.append("\n\nВаш ранг: %s".formatted(data.getRank().getAlias()));

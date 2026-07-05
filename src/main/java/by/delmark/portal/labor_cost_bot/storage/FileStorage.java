@@ -42,7 +42,7 @@ public class FileStorage {
         }
     }
 
-    @Cacheable(value = "userData", unless = "#result == null || #result.isEmpty()")
+    @Cacheable(value = "userData", unless = "#result == null")
     public Optional<UserData> getUserData() {
         Path dataDirPath = Paths.get(dataDir);
         Path dataJsonPath = dataDirPath.resolve("data.json");
