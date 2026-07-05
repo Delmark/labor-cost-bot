@@ -27,10 +27,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/**
- * Режим проставления трудозатрат по дням. Бот не шлёт новые сообщения — всё
- * происходит внутри одного сообщения через {@link EditMessageText}.
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
