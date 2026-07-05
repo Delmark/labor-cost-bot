@@ -8,6 +8,9 @@ import by.delmark.portal.labor_cost_bot.portal.response.ProjectResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,17 +26,18 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class PortalClient {
 
+    private static final String SESSION_CACHE = "session";
+    private static final String SESSION_KEY = "jsessionid";
+
     private final RestClient restClient;
     private final PortalCredentials portalCredentials;
-
-    private final AtomicReference<String> sessionId = new AtomicReference<>();
+    private final CacheManager cacheManager;
 
     @PostConstruct
     public void init() {
@@ -72,11 +76,28 @@ public class PortalClient {
             if (sessionToken == null) {
                 throw new IllegalStateException("JSESSIONID not found");
             }
-            sessionId.set(sessionToken);
+            sessionCache().put(SESSION_KEY, sessionToken);
         } catch (Exception e) {
             log.error("Failed to login", e);
             throw e;
         }
+    }
+
+    private String sessionId() {
+        String token = sessionCache().get(SESSION_KEY, String.class);
+        if (token == null) {
+            login();
+            token = sessionCache().get(SESSION_KEY, String.class);
+        }
+        return token;
+    }
+
+    private Cache sessionCache() {
+        Cache cache = cacheManager.getCache(SESSION_CACHE);
+        if (cache == null) {
+            throw new IllegalStateException("Cache '" + SESSION_CACHE + "' is not configured");
+        }
+        return cache;
     }
 
     @Retryable(includes = ExpiredSessionException.class)
@@ -85,7 +106,7 @@ public class PortalClient {
         return restClient.get()
                 .uri("https://portal.answer-42.ru/portal/api/profile/base")
                 .accept(MediaType.APPLICATION_JSON)
-                .cookie("JSESSIONID", sessionId.get())
+                .cookie("JSESSIONID", sessionId())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
                 .body(ProfileResponse.class);
@@ -100,18 +121,19 @@ public class PortalClient {
                             "employeeExternalId", employeeId
                         )
                 )
-                .cookie("JSESSIONID", sessionId.get())
+                .cookie("JSESSIONID", sessionId())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
                 .body(ProjectResponse.class);
     }
 
     @Retryable(includes = ExpiredSessionException.class)
+    @CacheEvict(value = "profileInfo")
     public void updateDayLaborCost(DayLaborCostRequest laborCostRequest) {
         restClient.post()
                 .uri("https://portal.answer-42.ru/portal/api/labor-costs/day/")
                 .body(laborCostRequest)
-                .cookie("JSESSIONID", sessionId.get())
+                .cookie("JSESSIONID", sessionId())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
                 .toBodilessEntity();

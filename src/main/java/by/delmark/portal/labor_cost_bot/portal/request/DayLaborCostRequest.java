@@ -13,5 +13,5 @@ import java.util.UUID;
 public class DayLaborCostRequest {
     UUID dayExternalId;
     UUID employeeExternalId;
-    List<ProjectValue> projectValues;
+    List<ProjectValue> projectValueList;
 }

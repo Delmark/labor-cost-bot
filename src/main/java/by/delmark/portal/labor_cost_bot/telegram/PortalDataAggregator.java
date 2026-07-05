@@ -86,13 +86,13 @@ public class PortalDataAggregator {
                     .append(dateFormat.format(day.getDayDate())));
         } else {
             responseText.append("\n\nНеобходимо заполнить ТРЗ на следующие периоды:");
-            generateDatePeriods(daysToFill).forEach(period -> responseText.append("\n• ").append(period));
+            generateDatePeriods(daysToFill).forEach(period -> responseText.append("\n- ").append(period));
         }
 
         List<FavoriteProject> projects = data.getFavoriteProjects();
         if (!CollectionUtils.isEmpty(projects)) {
             responseText.append("\n\nПроекты, доступные для заполнения из бота:");
-            projects.forEach(project -> responseText.append("\n• ").append(project.getShortName()));
+            projects.forEach(project -> responseText.append("\n- ").append(project.getShortName()));
         }
 
         responseText.append("\n\nВаш ранг: %s".formatted(data.getRank().getAlias()));

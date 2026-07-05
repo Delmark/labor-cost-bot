@@ -138,7 +138,7 @@ public class DayFillingService {
         DayLaborCostRequest request = new DayLaborCostRequest();
         request.setDayExternalId(day.getDayExternalId());
         request.setEmployeeExternalId(session.getEmployeeId());
-        request.setProjectValues(projectValues);
+        request.setProjectValueList(projectValues);
 
         log.info("Saving day {} with {} project(s)", day.getDayExternalId(), projectValues.size());
         portalClient.updateDayLaborCost(request);
@@ -163,7 +163,8 @@ public class DayFillingService {
                 Распределите 100%% между проектами.
                 Проставлено: %d%%   (осталось %d%%)
                 
-                Список проектов: %s%%"""
+                Список проектов:
+                %s"""
                 .formatted(
                         weekday,
                         dateFormat.format(day.getDayDate()),
