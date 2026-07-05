@@ -25,7 +25,7 @@ public class LaborCostReminderScheduler {
     private final FileStorage fileStorage;
     private final PortalDataAggregator portalDataAggregator;
 
-    @Scheduled(cron = "${reminder.cron:0 0 18 * * *}", zone = "${reminder.zone:Europe/Minsk}")
+    @Scheduled(cron = "${reminder.cron:0 0 18 * * *}", zone = "${reminder.zone:Europe/Moscow}")
     public void remindUncompletedDays() {
         Optional<UserData> userData = fileStorage.getUserData();
         if (userData.isEmpty()) {
