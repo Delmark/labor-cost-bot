@@ -22,6 +22,9 @@ public class HttpClientConfiguration {
     @Setter @Getter
     private String userAgent;
 
+    @Setter @Getter
+    private String baseUrl;
+
     @Bean
     public RestClient restClient() {
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -33,6 +36,9 @@ public class HttpClientConfiguration {
                 .build();
         requestFactory.setHttpClient(httpClient);
 
-        return RestClient.builder().requestFactory(requestFactory).build();
+        return RestClient.builder()
+                .baseUrl(baseUrl)
+                .requestFactory(requestFactory)
+                .build();
     }
 }

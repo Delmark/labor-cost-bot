@@ -1,6 +1,7 @@
 package by.delmark.portal.labor_cost_bot;
 
 import by.delmark.portal.labor_cost_bot.portal.PortalClient;
+import by.delmark.portal.labor_cost_bot.portal.PortalSessionManager;
 import com.pengrad.telegrambot.TelegramBot;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,9 @@ class LaborCostBotApplicationTests {
 
 	@MockitoBean
 	private PortalClient portalClient;
+
+	@MockitoBean
+	private PortalSessionManager portalSessionManager;
 
 	@MockitoBean
 	private TelegramBot telegramBot;
