@@ -54,7 +54,7 @@ public class PortalClient {
     }
 
     @Retryable(includes = ExpiredSessionException.class)
-    @CacheEvict(value = "profileInfo")
+    @CacheEvict(value = "profileInfo", allEntries = true)
     public void updateDayLaborCost(DayLaborCostRequest laborCostRequest) {
         restClient.post()
                 .uri("/portal/api/labor-costs/day/")
