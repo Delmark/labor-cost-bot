@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DayFillingService {
 
-    private static final int[] PRESETS = {0, 25, 50, 100};
+    private static final int[] PRESETS = {25, 50};
     private static final Locale RU = Locale.of("ru");
 
     private final TelegramBot bot;
@@ -68,20 +67,21 @@ public class DayFillingService {
 
         String[] parts = data.split(":");
         int projectIndex = Integer.parseInt(parts[1]);
-        int percent = Integer.parseInt(parts[2]);
+        int delta = Integer.parseInt(parts[2]);
 
         FavoriteProject project = session.getProjects().get(projectIndex);
         int current = session.currentPercent(project.getExternalId());
-        if (current == percent) {
-            return null;
+        int newPercent = current + delta;
+        if (newPercent < 0) {
+            return "Меньше 0%% по проекту нельзя";
         }
 
-        int othersTotal = session.currentTotal() - current;
-        if (othersTotal + percent > 100) {
-            return "Суммарно нельзя больше 100%%, осталось %d%%".formatted(100 - othersTotal);
+        int newTotal = session.currentTotal() + delta;
+        if (newTotal > 100) {
+            return "Суммарно нельзя больше 100%%, осталось %d%%".formatted(100 - session.currentTotal());
         }
 
-        session.setCurrentValue(project.getExternalId(), percent);
+        session.setCurrentValue(project.getExternalId(), newPercent);
         renderDay(chatId, messageId, session);
         return null;
     }
@@ -118,7 +118,7 @@ public class DayFillingService {
             saveDay(session);
             return "День сохранён ✅";
         }
-        if (total > 0) {
+        if (total != 0) {
             return "День не сохранён: нужно ровно 100%%, сейчас %d%%".formatted(total);
         }
         return null;
@@ -184,14 +184,16 @@ public class DayFillingService {
             FavoriteProject project = projects.get(i);
             int current = session.currentPercent(project.getExternalId());
 
-            InlineKeyboardButton[] row = new InlineKeyboardButton[PRESETS.length + 1];
+            InlineKeyboardButton[] row = new InlineKeyboardButton[PRESETS.length * 2 + 1];
             row[0] = new InlineKeyboardButton(project.getShortName() + " - " + current + "%")
                     .callbackData(Callbacks.NOOP);
             for (int j = 0; j < PRESETS.length; j++) {
                 int preset = PRESETS[j];
-                String label = current == preset ? "[" + preset + "]" : String.valueOf(preset);
-                row[j + 1] = new InlineKeyboardButton(label)
+                String label = String.valueOf(preset);
+                row[j + 1] = new InlineKeyboardButton("+" + label)
                         .callbackData(Callbacks.SET_PREFIX + i + ":" + preset);
+                row[j + 1 + PRESETS.length] = new InlineKeyboardButton("-" + label)
+                        .callbackData(Callbacks.SET_PREFIX + i + ":" + (-preset));
             }
             keyboard.addRow(row);
         }

@@ -1,6 +1,5 @@
 package by.delmark.portal.labor_cost_bot.telegram;
 
-import by.delmark.portal.labor_cost_bot.portal.PortalClient;
 import by.delmark.portal.labor_cost_bot.storage.FileStorage;
 import by.delmark.portal.labor_cost_bot.storage.UserData;
 import com.pengrad.telegrambot.TelegramBot;
