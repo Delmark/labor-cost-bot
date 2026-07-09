@@ -79,7 +79,7 @@ public class PortalDataAggregator {
         if (uncompleted < 5) {
             responseText.append("\n\nНеобходимо заполнить ТРЗ на следующие дни:");
             daysToFill.forEach(day -> responseText
-                    .append("\n• ")
+                    .append("\n- ")
                     .append(DayOfWeek.of(day.getDayOfWeekNumber())
                             .getDisplayName(TextStyle.FULL_STANDALONE, Locale.of("ru")))
                     .append(", ")

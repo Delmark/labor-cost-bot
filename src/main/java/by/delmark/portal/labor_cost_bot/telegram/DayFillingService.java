@@ -11,6 +11,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
 import com.pengrad.telegrambot.request.EditMessageText;
+import com.pengrad.telegrambot.response.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DayFillingService {
 
-    private static final int[] PRESETS = {25, 50};
+    private static final int[] PRESETS = {1, 5, 25, 50};
     private static final Locale RU = Locale.of("ru");
 
     private final TelegramBot bot;
@@ -73,12 +74,12 @@ public class DayFillingService {
         int current = session.currentPercent(project.getExternalId());
         int newPercent = current + delta;
         if (newPercent < 0) {
-            return "Меньше 0%% по проекту нельзя";
+            return "Нельзя заполнить ТРЗ по проекту меньше 0%";
         }
 
         int newTotal = session.currentTotal() + delta;
         if (newTotal > 100) {
-            return "Суммарно нельзя больше 100%%, осталось %d%%".formatted(100 - session.currentTotal());
+            return "Суммарное ТРЗ не может быть больше 100%%, осталось %d%%".formatted(100 - session.currentTotal());
         }
 
         session.setCurrentValue(project.getExternalId(), newPercent);
@@ -147,7 +148,10 @@ public class DayFillingService {
     private void renderDay(Long chatId, Integer messageId, FillSession session) {
         EditMessageText edit = new EditMessageText(chatId, messageId, buildText(session))
                 .replyMarkup(buildKeyboard(session));
-        bot.execute(edit);
+        BaseResponse response = bot.execute(edit);
+        if (!response.isOk()) {
+            log.warn("Failed to edit message {}: {} {}", messageId, response.errorCode(), response.description());
+        }
     }
 
     private String buildText(FillSession session) {
@@ -184,15 +188,17 @@ public class DayFillingService {
             FavoriteProject project = projects.get(i);
             int current = session.currentPercent(project.getExternalId());
 
-            InlineKeyboardButton[] row = new InlineKeyboardButton[PRESETS.length * 2 + 1];
-            row[0] = new InlineKeyboardButton(project.getShortName() + " - " + current + "%")
+            InlineKeyboardButton projectInfo = new InlineKeyboardButton(project.getShortName() + " - " + current + "%")
                     .callbackData(Callbacks.NOOP);
+            keyboard.addRow(projectInfo);
+
+            InlineKeyboardButton[] row = new InlineKeyboardButton[PRESETS.length * 2];
             for (int j = 0; j < PRESETS.length; j++) {
                 int preset = PRESETS[j];
                 String label = String.valueOf(preset);
-                row[j + 1] = new InlineKeyboardButton("+" + label)
+                row[j] = new InlineKeyboardButton("+" + label)
                         .callbackData(Callbacks.SET_PREFIX + i + ":" + preset);
-                row[j + 1 + PRESETS.length] = new InlineKeyboardButton("-" + label)
+                row[j + PRESETS.length] = new InlineKeyboardButton("-" + label)
                         .callbackData(Callbacks.SET_PREFIX + i + ":" + (-preset));
             }
             keyboard.addRow(row);
