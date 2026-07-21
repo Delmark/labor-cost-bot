@@ -13,5 +13,5 @@ import java.util.UUID;
 public class ProfileResponse {
     UUID externalId;
     String fullName;
-    List<Calendar> calendarDtoList;
+    Integer emptyLaborCostDays;
 }

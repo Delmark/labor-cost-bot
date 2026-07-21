@@ -4,10 +4,12 @@ import by.delmark.portal.labor_cost_bot.exceptions.ExpiredSessionException;
 import by.delmark.portal.labor_cost_bot.portal.request.DayLaborCostRequest;
 import by.delmark.portal.labor_cost_bot.portal.response.ProfileResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ProjectResponse;
+import by.delmark.portal.labor_cost_bot.portal.response.dto.Calendar;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,6 +39,17 @@ public class PortalClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
                 .body(ProfileResponse.class);
+    }
+
+    @Retryable(includes = ExpiredSessionException.class)
+    @Cacheable(value = "costCalendar", key = "T(java.time.LocalDate).now()")
+    public List<Calendar> getCalendar(UUID employeeId) {
+        return restClient.get()
+                .uri("/portal/api/labor-costs/calendar/" + employeeId)
+                .cookie("JSESSIONID", sessionManager.getSessionId())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
+                .body(new ParameterizedTypeReference<>() {});
     }
 
     @Retryable(includes = ExpiredSessionException.class)

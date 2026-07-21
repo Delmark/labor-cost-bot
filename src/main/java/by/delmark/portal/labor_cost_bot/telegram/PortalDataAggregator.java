@@ -35,7 +35,7 @@ public class PortalDataAggregator {
 
         String currentYear = yearFormatter.format(LocalDate.now());
 
-        Calendar currentCalendar = profileResponse.getCalendarDtoList().stream()
+        Calendar currentCalendar = portalClient.getCalendar(profileResponse.getExternalId()).stream()
                 .filter(calendar -> calendar.getFiscalYearCode().equals(currentYear))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No calendar for fiscal year " + currentYear));
