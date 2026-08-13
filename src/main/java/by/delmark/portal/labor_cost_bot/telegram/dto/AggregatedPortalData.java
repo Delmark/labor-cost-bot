@@ -19,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AggregatedPortalData {
     List<Day> daysToFill;
-    LaborRank rank;
     List<FavoriteProject> favoriteProjects;
     UUID employeeId;
 }

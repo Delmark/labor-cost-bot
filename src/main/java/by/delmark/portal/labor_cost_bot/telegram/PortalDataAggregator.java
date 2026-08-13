@@ -7,7 +7,6 @@ import by.delmark.portal.labor_cost_bot.portal.response.dto.Day;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.FavoriteProject;
 import by.delmark.portal.labor_cost_bot.telegram.dto.AggregatedPortalData;
 import by.delmark.portal.labor_cost_bot.telegram.dto.CollectedInfo;
-import by.delmark.portal.labor_cost_bot.telegram.dto.LaborRank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -56,7 +55,6 @@ public class PortalDataAggregator {
 
         return AggregatedPortalData.builder()
                 .daysToFill(uncompletedDays)
-                .rank(LaborRank.getLaborRank(uncompletedDays.size()))
                 .favoriteProjects(favoriteProjects)
                 .employeeId(employeeId)
                 .build();
@@ -69,8 +67,7 @@ public class PortalDataAggregator {
 
         List<Day> daysToFill = data.getDaysToFill();
         if (daysToFill.isEmpty()) {
-            responseText.append("\nУ вас нет незаполненных дней! Идеально!");
-            responseText.append("\n\nВаш ранг: %s".formatted(data.getRank().getAlias()));
+            responseText.append("\nУ вас нет незаполненных дней");
             return new CollectedInfo(responseText.toString(), false);
         }
 
@@ -95,7 +92,6 @@ public class PortalDataAggregator {
             projects.forEach(project -> responseText.append("\n- ").append(project.getShortName()));
         }
 
-        responseText.append("\n\nВаш ранг: %s".formatted(data.getRank().getAlias()));
         return new CollectedInfo(responseText.toString(), true);
     }
 
