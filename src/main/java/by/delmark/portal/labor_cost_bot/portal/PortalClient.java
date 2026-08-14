@@ -4,6 +4,7 @@ import by.delmark.portal.labor_cost_bot.exceptions.ExpiredSessionException;
 import by.delmark.portal.labor_cost_bot.portal.request.ArticleFeedRequest;
 import by.delmark.portal.labor_cost_bot.portal.request.DayLaborCostRequest;
 import by.delmark.portal.labor_cost_bot.portal.response.ArticleFeedResponse;
+import by.delmark.portal.labor_cost_bot.portal.response.ArticleTagResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ProfileResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ProjectResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.Calendar;
@@ -82,10 +83,20 @@ public class PortalClient {
     }
 
     @Retryable(includes = ExpiredSessionException.class)
-    public List<ArticleFeedResponse> getNewsFeed(ArticleFeedRequest req) {
+    public List<ArticleFeedResponse> getArticleFeed(ArticleFeedRequest req) {
         return restClient.post()
                 .uri("portal/api/wall/articles/all")
                 .body(req)
+                .cookie("JSESSIONID", sessionManager.getSessionId())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
+                .body(new ParameterizedTypeReference<>() {});
+    }
+
+    @Retryable(includes = ExpiredSessionException.class)
+    public List<ArticleTagResponse> getArticleTags() {
+        return restClient.get()
+                .uri("portal/api/wall/articles/tags")
                 .cookie("JSESSIONID", sessionManager.getSessionId())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler())

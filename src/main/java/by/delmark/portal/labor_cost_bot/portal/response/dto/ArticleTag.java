@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ArticleMainTag {
+public class ArticleTag {
     UUID externalId;
     String name;
     Boolean isReadyForDeletion;
