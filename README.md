@@ -8,21 +8,11 @@
 
 ## Возможности
 
-- **`/info`** — сводка по трудозатратам: сколько дней осталось заполнить и по
+- **`/info`** - сводка по трудозатратам: сколько дней осталось заполнить и по
   каким проектам.
-- **Режим «Проставить дни»** — интерактивное заполнение ТРЗ прямо в сообщении, имеется
+- **Режим «Проставить дни»** - интерактивное заполнение ТРЗ прямо в сообщении, имеется
   возможность выставить определенное произвольное количество % ТРЗ для каждого проекта.
 - **Ежедневное напоминание** по заполнению ТРЗ если есть незаполненные дни.
-
-## Стек
-
-- Java 25, Spring Boot 4.1
-- Spring `RestClient` + Apache HttpClient 5
-- [pengrad/java-telegram-bot-api](https://github.com/pengrad/java-telegram-bot-api)
-- Caffeine + Spring Cache — сессия портала, профиль, `data.json`
-- Jackson 3 (`tools.jackson`)
-- Lombok
-- Gradle (Kotlin DSL), сборка через wrapper
 
 ## Конфигурация
 
@@ -41,7 +31,6 @@
 docker build -t labor-cost-bot .
 
 docker run -d --name labor-cost-bot \
-  --env-file .env
-  -p 51001:51001 \
+  --env-file .env \
   labor-cost-bot
 ```
