@@ -27,6 +27,8 @@ dependencies {
 	implementation("org.apache.httpcomponents.client5:httpclient5:5.6.2")
 	implementation("com.github.ben-manes.caffeine:caffeine")
 
+	implementation("org.jsoup:jsoup:1.23.1")
+
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 	annotationProcessor("org.projectlombok:lombok")
