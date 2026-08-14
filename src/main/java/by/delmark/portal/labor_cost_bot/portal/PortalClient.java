@@ -4,6 +4,7 @@ import by.delmark.portal.labor_cost_bot.exceptions.ExpiredSessionException;
 import by.delmark.portal.labor_cost_bot.portal.request.ArticleFeedRequest;
 import by.delmark.portal.labor_cost_bot.portal.request.DayLaborCostRequest;
 import by.delmark.portal.labor_cost_bot.portal.response.ArticleFeedResponse;
+import by.delmark.portal.labor_cost_bot.portal.response.ArticleResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ArticleTagResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ProfileResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ProjectResponse;
@@ -101,6 +102,19 @@ public class PortalClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
                 .body(new ParameterizedTypeReference<>() {});
+    }
+
+    @Retryable(includes = ExpiredSessionException.class)
+    public ArticleResponse getArticle(UUID articleId) {
+        if (articleId == null) {
+            throw new IllegalArgumentException("articleId cannot be null");
+        }
+        return restClient.get()
+                .uri("portal/api/wall/articles/" + articleId)
+                .cookie("JSESSIONID", sessionManager.getSessionId())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
+                .body(ArticleResponse.class);
     }
 
     private RestClient.ResponseSpec.ErrorHandler errorHandler() {
