@@ -1,7 +1,9 @@
 package by.delmark.portal.labor_cost_bot.portal;
 
 import by.delmark.portal.labor_cost_bot.exceptions.ExpiredSessionException;
+import by.delmark.portal.labor_cost_bot.portal.request.ArticleFeedRequest;
 import by.delmark.portal.labor_cost_bot.portal.request.DayLaborCostRequest;
+import by.delmark.portal.labor_cost_bot.portal.response.ArticleFeedResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ProfileResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.ProjectResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.Calendar;
@@ -77,6 +79,17 @@ public class PortalClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
                 .toBodilessEntity();
+    }
+
+    @Retryable(includes = ExpiredSessionException.class)
+    public List<ArticleFeedResponse> getNewsFeed(ArticleFeedRequest req) {
+        return restClient.post()
+                .uri("portal/api/wall/articles/all")
+                .body(req)
+                .cookie("JSESSIONID", sessionManager.getSessionId())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, errorHandler())
+                .body(new ParameterizedTypeReference<>() {});
     }
 
     private RestClient.ResponseSpec.ErrorHandler errorHandler() {
