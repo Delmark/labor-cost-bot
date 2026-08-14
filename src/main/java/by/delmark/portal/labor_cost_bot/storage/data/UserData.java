@@ -1,4 +1,4 @@
-package by.delmark.portal.labor_cost_bot.storage;
+package by.delmark.portal.labor_cost_bot.storage.data;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,7 @@
 package by.delmark.portal.labor_cost_bot.telegram;
 
 import by.delmark.portal.labor_cost_bot.storage.FileStorage;
-import by.delmark.portal.labor_cost_bot.storage.UserData;
+import by.delmark.portal.labor_cost_bot.storage.data.UserData;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;

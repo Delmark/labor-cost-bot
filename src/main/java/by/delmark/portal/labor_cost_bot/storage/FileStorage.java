@@ -1,5 +1,6 @@
 package by.delmark.portal.labor_cost_bot.storage;
 
+import by.delmark.portal.labor_cost_bot.storage.data.UserData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,6 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
