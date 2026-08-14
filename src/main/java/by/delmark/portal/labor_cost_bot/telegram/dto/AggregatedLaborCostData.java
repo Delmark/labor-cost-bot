@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AggregatedPortalData {
+public class AggregatedLaborCostData {
     List<Day> daysToFill;
     List<FavoriteProject> favoriteProjects;
     UUID employeeId;

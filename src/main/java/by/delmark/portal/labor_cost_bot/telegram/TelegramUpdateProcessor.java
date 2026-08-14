@@ -2,14 +2,11 @@ package by.delmark.portal.labor_cost_bot.telegram;
 
 import by.delmark.portal.labor_cost_bot.storage.FileStorage;
 import by.delmark.portal.labor_cost_bot.storage.UserData;
-import by.delmark.portal.labor_cost_bot.telegram.callbacks.DayLaborCostCallbacks;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.message.MaybeInaccessibleMessage;
-import com.pengrad.telegrambot.request.AnswerCallbackQuery;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +18,7 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class TelegramUpdatesProcessor {
+public class TelegramUpdateProcessor {
 
     private final MessageCommandExecutor messageCommandExecutor;
     private final CallbackExecutor callbackExecutor;

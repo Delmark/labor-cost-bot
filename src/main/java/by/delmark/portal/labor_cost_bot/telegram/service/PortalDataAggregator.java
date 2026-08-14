@@ -1,11 +1,11 @@
-package by.delmark.portal.labor_cost_bot.telegram;
+package by.delmark.portal.labor_cost_bot.telegram.service;
 
 import by.delmark.portal.labor_cost_bot.portal.PortalClient;
 import by.delmark.portal.labor_cost_bot.portal.response.ProfileResponse;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.Calendar;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.Day;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.FavoriteProject;
-import by.delmark.portal.labor_cost_bot.telegram.dto.AggregatedPortalData;
+import by.delmark.portal.labor_cost_bot.telegram.dto.AggregatedLaborCostData;
 import by.delmark.portal.labor_cost_bot.telegram.dto.CollectedInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class PortalDataAggregator {
     private final DateTimeFormatter yearFormatter = DateTimeFormatter.ofPattern("yyyy");
     private final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    public AggregatedPortalData getAggregatedPortalData() {
+    public AggregatedLaborCostData getAggregatedPortalData() {
         ProfileResponse profileResponse = portalClient.getProfileBaseInfo();
 
         String currentYear = yearFormatter.format(LocalDate.now());
@@ -53,7 +53,7 @@ public class PortalDataAggregator {
                 .filter(project -> project.getStatus().equalsIgnoreCase("активен"))
                 .collect(Collectors.toList());
 
-        return AggregatedPortalData.builder()
+        return AggregatedLaborCostData.builder()
                 .daysToFill(uncompletedDays)
                 .favoriteProjects(favoriteProjects)
                 .employeeId(employeeId)
@@ -61,7 +61,7 @@ public class PortalDataAggregator {
     }
 
     public CollectedInfo collectInfoMessage() {
-        AggregatedPortalData data = getAggregatedPortalData();
+        AggregatedLaborCostData data = getAggregatedPortalData();
         StringBuilder responseText = new StringBuilder();
         responseText.append("Текущая информация по трудозатратам:\n");
 

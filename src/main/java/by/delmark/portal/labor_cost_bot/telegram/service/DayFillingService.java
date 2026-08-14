@@ -1,4 +1,4 @@
-package by.delmark.portal.labor_cost_bot.telegram;
+package by.delmark.portal.labor_cost_bot.telegram.service;
 
 import by.delmark.portal.labor_cost_bot.portal.PortalClient;
 import by.delmark.portal.labor_cost_bot.portal.request.DayLaborCostRequest;
@@ -6,7 +6,7 @@ import by.delmark.portal.labor_cost_bot.portal.request.dto.ProjectValue;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.Day;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.FavoriteProject;
 import by.delmark.portal.labor_cost_bot.telegram.callbacks.DayLaborCostCallbacks;
-import by.delmark.portal.labor_cost_bot.telegram.dto.AggregatedPortalData;
+import by.delmark.portal.labor_cost_bot.telegram.dto.AggregatedLaborCostData;
 import by.delmark.portal.labor_cost_bot.telegram.dto.FillSession;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
@@ -44,7 +44,7 @@ public class DayFillingService {
     private final Map<Long, FillSession> sessions = new ConcurrentHashMap<>();
 
     public String enter(Long chatId, Integer messageId) {
-        AggregatedPortalData data = portalDataAggregator.getAggregatedPortalData();
+        AggregatedLaborCostData data = portalDataAggregator.getAggregatedPortalData();
         List<Day> days = data.getDaysToFill().stream()
                 .sorted(Comparator.comparing(Day::getDayDate))
                 .collect(Collectors.toList());
