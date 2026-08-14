@@ -2,7 +2,7 @@ package by.delmark.portal.labor_cost_bot.scheduler;
 
 import by.delmark.portal.labor_cost_bot.storage.FileStorage;
 import by.delmark.portal.labor_cost_bot.storage.UserData;
-import by.delmark.portal.labor_cost_bot.telegram.DayLaborCostCallbacks;
+import by.delmark.portal.labor_cost_bot.telegram.callbacks.DayLaborCostCallbacks;
 import by.delmark.portal.labor_cost_bot.telegram.PortalDataAggregator;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;

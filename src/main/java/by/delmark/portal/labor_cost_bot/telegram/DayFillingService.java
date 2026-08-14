@@ -5,6 +5,7 @@ import by.delmark.portal.labor_cost_bot.portal.request.DayLaborCostRequest;
 import by.delmark.portal.labor_cost_bot.portal.request.dto.ProjectValue;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.Day;
 import by.delmark.portal.labor_cost_bot.portal.response.dto.FavoriteProject;
+import by.delmark.portal.labor_cost_bot.telegram.callbacks.DayLaborCostCallbacks;
 import by.delmark.portal.labor_cost_bot.telegram.dto.AggregatedPortalData;
 import by.delmark.portal.labor_cost_bot.telegram.dto.FillSession;
 import com.pengrad.telegrambot.TelegramBot;

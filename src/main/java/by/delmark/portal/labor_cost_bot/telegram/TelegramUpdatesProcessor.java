@@ -2,6 +2,7 @@ package by.delmark.portal.labor_cost_bot.telegram;
 
 import by.delmark.portal.labor_cost_bot.storage.FileStorage;
 import by.delmark.portal.labor_cost_bot.storage.UserData;
+import by.delmark.portal.labor_cost_bot.telegram.callbacks.DayLaborCostCallbacks;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.CallbackQuery;
@@ -23,7 +24,7 @@ import java.util.Objects;
 public class TelegramUpdatesProcessor {
 
     private final MessageCommandExecutor messageCommandExecutor;
-    private final DayFillingService dayFillingService;
+    private final CallbackExecutor callbackExecutor;
     private final FileStorage fileStorage;
     private final TelegramBot bot;
 
@@ -59,54 +60,9 @@ public class TelegramUpdatesProcessor {
         if (!Objects.equals(userId, callbackQuery.from().id())) {
             return;
         }
-
-        String toast;
-        try {
-            toast = dispatchCallback(callbackQuery);
-        } catch (Exception e) {
-            log.error("Failed to handle callback {}", callbackQuery.data(), e);
-            toast = "Произошла ошибка, попробуйте позже";
-        }
-
-        AnswerCallbackQuery answer = new AnswerCallbackQuery(callbackQuery.id());
-        if (toast != null) {
-            answer.text(toast);
-        }
-        bot.execute(answer);
+        callbackExecutor.handleCallback(callbackQuery);
     }
 
-    private String dispatchCallback(CallbackQuery callbackQuery) {
-        String data = callbackQuery.data();
-        MaybeInaccessibleMessage message = callbackQuery.maybeInaccessibleMessage();
-        if (data == null || message == null) {
-            return null;
-        }
-        Long chatId = message.chat().id();
-        Integer messageId = message.messageId();
-
-        if (DayLaborCostCallbacks.INFO.equals(data)) {
-            messageCommandExecutor.sendInfo(chatId);
-            return null;
-        }
-        if (DayLaborCostCallbacks.FILL.equals(data)) {
-            return dayFillingService.enter(chatId, messageId);
-        }
-        if (data.startsWith(DayLaborCostCallbacks.SET_PREFIX)) {
-            return dayFillingService.setPercent(chatId, messageId, data);
-        }
-        if (DayLaborCostCallbacks.NAV_PREV.equals(data)) {
-            return dayFillingService.navigate(chatId, messageId, -1);
-        }
-        if (DayLaborCostCallbacks.NAV_NEXT.equals(data)) {
-            return dayFillingService.navigate(chatId, messageId, 1);
-        }
-        if (DayLaborCostCallbacks.EXIT.equals(data)) {
-            String toast = dayFillingService.leave(chatId);
-            messageCommandExecutor.editToInfo(chatId, messageId);
-            return toast;
-        }
-        return null;
-    }
 
     private void handleMessage(Update update) {
         Message message = update.message();

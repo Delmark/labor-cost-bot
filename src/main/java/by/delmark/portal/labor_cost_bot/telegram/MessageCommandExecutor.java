@@ -1,5 +1,6 @@
 package by.delmark.portal.labor_cost_bot.telegram;
 
+import by.delmark.portal.labor_cost_bot.telegram.callbacks.DayLaborCostCallbacks;
 import by.delmark.portal.labor_cost_bot.telegram.dto.CollectedInfo;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
