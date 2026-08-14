@@ -54,7 +54,7 @@ public class MessageCommandExecutor {
             long chatId = message.chat().id();
             SendMessage messageRequest = new SendMessage(chatId, responseText)
                     .replyMarkup(new InlineKeyboardMarkup(
-                            new InlineKeyboardButton("Информация по трудозатратам").callbackData(Callbacks.INFO)));
+                            new InlineKeyboardButton("Информация по трудозатратам").callbackData(DayLaborCostCallbacks.INFO)));
             bot.execute(messageRequest);
         };
     }
@@ -92,6 +92,6 @@ public class MessageCommandExecutor {
 
     private InlineKeyboardMarkup fillKeyboard() {
         return new InlineKeyboardMarkup(
-                new InlineKeyboardButton("Проставить дни").callbackData(Callbacks.FILL));
+                new InlineKeyboardButton("Проставить дни").callbackData(DayLaborCostCallbacks.FILL));
     }
 }

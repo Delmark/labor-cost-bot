@@ -189,7 +189,7 @@ public class DayFillingService {
             int current = session.currentPercent(project.getExternalId());
 
             InlineKeyboardButton projectInfo = new InlineKeyboardButton(project.getShortName() + " - " + current + "%")
-                    .callbackData(Callbacks.NOOP);
+                    .callbackData(DayLaborCostCallbacks.NOOP);
             keyboard.addRow(projectInfo);
 
             InlineKeyboardButton[] row = new InlineKeyboardButton[PRESETS.length * 2];
@@ -197,17 +197,17 @@ public class DayFillingService {
                 int preset = PRESETS[j];
                 String label = String.valueOf(preset);
                 row[j] = new InlineKeyboardButton("+" + label)
-                        .callbackData(Callbacks.SET_PREFIX + i + ":" + preset);
+                        .callbackData(DayLaborCostCallbacks.SET_PREFIX + i + ":" + preset);
                 row[j + PRESETS.length] = new InlineKeyboardButton("-" + label)
-                        .callbackData(Callbacks.SET_PREFIX + i + ":" + (-preset));
+                        .callbackData(DayLaborCostCallbacks.SET_PREFIX + i + ":" + (-preset));
             }
             keyboard.addRow(row);
         }
 
         keyboard.addRow(
-                new InlineKeyboardButton("<-").callbackData(Callbacks.NAV_PREV),
-                new InlineKeyboardButton("Выйти").callbackData(Callbacks.EXIT),
-                new InlineKeyboardButton("->").callbackData(Callbacks.NAV_NEXT)
+                new InlineKeyboardButton("<-").callbackData(DayLaborCostCallbacks.NAV_PREV),
+                new InlineKeyboardButton("Выйти").callbackData(DayLaborCostCallbacks.EXIT),
+                new InlineKeyboardButton("->").callbackData(DayLaborCostCallbacks.NAV_NEXT)
         );
         return keyboard;
     }

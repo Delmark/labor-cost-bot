@@ -84,23 +84,23 @@ public class TelegramUpdatesProcessor {
         Long chatId = message.chat().id();
         Integer messageId = message.messageId();
 
-        if (Callbacks.INFO.equals(data)) {
+        if (DayLaborCostCallbacks.INFO.equals(data)) {
             messageCommandExecutor.sendInfo(chatId);
             return null;
         }
-        if (Callbacks.FILL.equals(data)) {
+        if (DayLaborCostCallbacks.FILL.equals(data)) {
             return dayFillingService.enter(chatId, messageId);
         }
-        if (data.startsWith(Callbacks.SET_PREFIX)) {
+        if (data.startsWith(DayLaborCostCallbacks.SET_PREFIX)) {
             return dayFillingService.setPercent(chatId, messageId, data);
         }
-        if (Callbacks.NAV_PREV.equals(data)) {
+        if (DayLaborCostCallbacks.NAV_PREV.equals(data)) {
             return dayFillingService.navigate(chatId, messageId, -1);
         }
-        if (Callbacks.NAV_NEXT.equals(data)) {
+        if (DayLaborCostCallbacks.NAV_NEXT.equals(data)) {
             return dayFillingService.navigate(chatId, messageId, 1);
         }
-        if (Callbacks.EXIT.equals(data)) {
+        if (DayLaborCostCallbacks.EXIT.equals(data)) {
             String toast = dayFillingService.leave(chatId);
             messageCommandExecutor.editToInfo(chatId, messageId);
             return toast;

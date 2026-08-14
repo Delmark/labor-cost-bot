@@ -2,7 +2,7 @@ package by.delmark.portal.labor_cost_bot.scheduler;
 
 import by.delmark.portal.labor_cost_bot.storage.FileStorage;
 import by.delmark.portal.labor_cost_bot.storage.UserData;
-import by.delmark.portal.labor_cost_bot.telegram.Callbacks;
+import by.delmark.portal.labor_cost_bot.telegram.DayLaborCostCallbacks;
 import by.delmark.portal.labor_cost_bot.telegram.PortalDataAggregator;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
@@ -41,7 +41,7 @@ public class LaborCostReminderScheduler {
             long chatId = userData.get().getChatId();
             SendMessage reminder = new SendMessage(chatId, buildReminder(uncompleted))
                     .replyMarkup(new InlineKeyboardMarkup(
-                            new InlineKeyboardButton("Проставить дни").callbackData(Callbacks.FILL)));
+                            new InlineKeyboardButton("Проставить дни").callbackData(DayLaborCostCallbacks.FILL)));
             bot.execute(reminder);
         } catch (Exception e) {
             log.error("Не удалось отправить ежедневное напоминание", e);

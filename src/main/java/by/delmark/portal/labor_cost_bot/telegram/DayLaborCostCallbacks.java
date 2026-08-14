@@ -1,6 +1,6 @@
 package by.delmark.portal.labor_cost_bot.telegram;
 
-public final class Callbacks {
+public final class DayLaborCostCallbacks {
 
     public static final String INFO = "info";
 
@@ -14,6 +14,6 @@ public final class Callbacks {
 
     public static final String NOOP = "noop";
 
-    private Callbacks() {
+    private DayLaborCostCallbacks() {
     }
 }
