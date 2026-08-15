@@ -116,13 +116,16 @@ public enum HtmlTagMappingRegistry {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
         String headerFill = Strings.repeat("#", headerLevel);
-        return headerFill + " " + content;
+        return "\n" + headerFill + " " + content;
     }),
 
     PARAGRAPH("p", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
-        return content + "\n\n";
+        if (content.isEmpty()) {
+            return "";
+        }
+        return "\n" + content;
     }),;
 
     private final String htmlTag;

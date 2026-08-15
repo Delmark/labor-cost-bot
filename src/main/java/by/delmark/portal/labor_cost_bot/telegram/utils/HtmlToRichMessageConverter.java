@@ -5,6 +5,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class HtmlToRichMessageConverter {
 
-    public static final Map<String, HtmlTagMappingRegistry> htmlTagRegistry =
+    public static final Map<String, HtmlTagMappingRegistry> htmlMappingRegistry =
             Arrays.stream(HtmlTagMappingRegistry.values())
                     .collect(Collectors.toMap(
                             HtmlTagMappingRegistry::getHtmlTag,
@@ -22,8 +23,11 @@ public class HtmlToRichMessageConverter {
                     ));
 
     public String convertHtmlToMarkdown(String html) {
+        if (!StringUtils.hasText(html)) {
+            return "";
+        }
         Document document = Jsoup.parse(html);
-        Elements allElements = document.getAllElements();
+        Elements allElements = document.body().children();
 
         StringBuilder markdown = new StringBuilder();
 
@@ -37,11 +41,16 @@ public class HtmlToRichMessageConverter {
 
     public String convertTagToMarkdown(Element element) {
         String tag = element.tagName();
-        // если мы не знаем что это за тэг, поставим параграф по умолчанию
-        if (!htmlTagRegistry.containsKey(tag)) {
-            tag = HtmlTagMappingRegistry.PARAGRAPH.getHtmlTag();
+        HtmlTagMappingRegistry tagFromRegistry;
+        if (htmlMappingRegistry.containsKey(tag)) {
+            tagFromRegistry = htmlMappingRegistry.get(tag);
+        } else if (tag.matches(HtmlTagMappingRegistry.HEADING.getHtmlTag())) {
+            // у заголовков N-ого уровня я поставил тэг регуляркой
+            tagFromRegistry = HtmlTagMappingRegistry.HEADING;
+        } else {
+            // если мы не знаем что это за тэг, поставим параграф по умолчанию
+            tagFromRegistry = HtmlTagMappingRegistry.PARAGRAPH;
         }
-        HtmlTagMappingRegistry tagFromRegistry = htmlTagRegistry.get(tag);
         Function<Element, String> toMarkdownConverter = tagFromRegistry.getMarkdownConverter();
         return toMarkdownConverter.apply(element);
     }
