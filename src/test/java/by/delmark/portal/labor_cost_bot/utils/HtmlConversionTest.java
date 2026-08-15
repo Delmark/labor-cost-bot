@@ -4,7 +4,7 @@ import by.delmark.portal.labor_cost_bot.telegram.utils.HtmlToRichMessageConverte
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class HtmlConversionTest {
+class HtmlConversionTest {
 
     @Test
     void paragraph_conversion() {
@@ -42,6 +42,14 @@ public class HtmlConversionTest {
     void anchor_link() {
         String html = "<a href=\"http://test\">";
         String expected = "[](http://test)";
+        String result = HtmlToRichMessageConverter.convertHtmlToMarkdown(html);
+        Assertions.assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void anchor_with_text() {
+        String html = "<a href=\"http://test/\">test text</a>";
+        String expected = "[test text](http://test/)";
         String result = HtmlToRichMessageConverter.convertHtmlToMarkdown(html);
         Assertions.assertThat(result).isEqualTo(expected);
     }
