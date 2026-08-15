@@ -3,8 +3,6 @@ package by.delmark.portal.labor_cost_bot.telegram.utils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
-import org.apache.tomcat.util.buf.StringUtils;
-import org.jsoup.internal.StringUtil;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
@@ -16,29 +14,34 @@ import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
-public enum HtmlTagRegistry {
+public enum HtmlTagMappingRegistry {
     BOLD("strong", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
         return "**" + content + "**";
     }),
+
     BREAK("br", (_) -> "\n"),
+
     ITALIC("em", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
         return "_" + content + "_";
     }),
+
     LINK("a", (element) -> {
         StringBuilder content = new StringBuilder();
         String href = element.attr("href");
         writeInnerContent(content, element);
         return "[" + content + "](" + href + ")";
     }),
+
     UNDERSCORE("u", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
         return "<u>" + content + "</u>"; // почти ничего не поменялось
     }),
+
     ORDERED_LIST("ol", (element) -> {
         AtomicInteger order = new AtomicInteger();
         StringBuilder content = new StringBuilder();
@@ -52,7 +55,10 @@ public enum HtmlTagRegistry {
                     writeInnerContent(innerLiContent, innerListEl);
                     content.append(elementOrder).append(innerLiContent).append("\n");
                 }
-                case Element innerElement -> content.append(HtmlToRichMessageConverter.convertTagToMarkdown(innerElement));
+                case Element innerElement -> content.append(
+                        HtmlToRichMessageConverter
+                                .convertTagToMarkdown(innerElement)
+                );
                 case TextNode textNode -> content.append(textNode.text());
                 default -> {}
             }
@@ -60,6 +66,7 @@ public enum HtmlTagRegistry {
 
         return content.toString();
     }),
+
     UNORDERED_LIST("ul", (element) -> {
         StringBuilder content = new StringBuilder();
 
@@ -71,7 +78,10 @@ public enum HtmlTagRegistry {
                     writeInnerContent(innerLiContent, innerListEl);
                     content.append("*").append(innerLiContent).append("\n");
                 }
-                case Element innerElement -> content.append(HtmlToRichMessageConverter.convertTagToMarkdown(innerElement));
+                case Element innerElement -> content.append(
+                        HtmlToRichMessageConverter
+                                .convertTagToMarkdown(innerElement)
+                );
                 case TextNode textNode -> content.append(textNode.text());
                 default -> {}
             }
@@ -79,11 +89,13 @@ public enum HtmlTagRegistry {
 
         return content.toString();
     }),
+
     STRIKETHROUGH("s", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
         return "~~" + content + "~~";
     }),
+
     QUOTE("blockquote", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
@@ -93,10 +105,12 @@ public enum HtmlTagRegistry {
                 .map(s -> (s.isBlank()) ? ">" : "> " + s)
                 .collect(Collectors.joining("\n"));
     }),
+
     IMAGE("img", (element) -> {
         String imageSource = element.attr("src");
         return "![](" + imageSource + ")";
     }),
+
     HEADING("h[1-6]", (element) -> {
         int headerLevel = Character.digit(element.tag().name().charAt(1), 10);
         StringBuilder content = new StringBuilder();
@@ -104,6 +118,7 @@ public enum HtmlTagRegistry {
         String headerFill = Strings.repeat("#", headerLevel);
         return headerFill + " " + content;
     }),
+
     PARAGRAPH("p", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);

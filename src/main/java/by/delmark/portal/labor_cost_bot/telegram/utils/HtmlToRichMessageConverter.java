@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class HtmlToRichMessageConverter {
 
-    public static final Map<String, HtmlTagRegistry> htmlTagRegistry =
-            Arrays.stream(HtmlTagRegistry.values())
+    public static final Map<String, HtmlTagMappingRegistry> htmlTagRegistry =
+            Arrays.stream(HtmlTagMappingRegistry.values())
                     .collect(Collectors.toMap(
-                            HtmlTagRegistry::getHtmlTag,
+                            HtmlTagMappingRegistry::getHtmlTag,
                             Function.identity()
                     ));
 
@@ -39,9 +39,9 @@ public class HtmlToRichMessageConverter {
         String tag = element.tagName();
         // если мы не знаем что это за тэг, поставим параграф по умолчанию
         if (!htmlTagRegistry.containsKey(tag)) {
-            tag = HtmlTagRegistry.PARAGRAPH.getHtmlTag();
+            tag = HtmlTagMappingRegistry.PARAGRAPH.getHtmlTag();
         }
-        HtmlTagRegistry tagFromRegistry = htmlTagRegistry.get(tag);
+        HtmlTagMappingRegistry tagFromRegistry = htmlTagRegistry.get(tag);
         Function<Element, String> toMarkdownConverter = tagFromRegistry.getMarkdownConverter();
         return toMarkdownConverter.apply(element);
     }
