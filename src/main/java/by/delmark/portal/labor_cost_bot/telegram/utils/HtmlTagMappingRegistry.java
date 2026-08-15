@@ -49,7 +49,7 @@ public enum HtmlTagMappingRegistry {
         List<Node> childNodes = element.childNodes();
         childNodes.forEach(childNode -> {
             switch (childNode) {
-                case Element innerListEl when element.tag().equals("li") -> {
+                case Element innerListEl when element.tagName().equals("li") -> {
                     String elementOrder = order.incrementAndGet() + ". ";
                     StringBuilder innerLiContent = new StringBuilder();
                     writeInnerContent(innerLiContent, innerListEl);
@@ -73,7 +73,7 @@ public enum HtmlTagMappingRegistry {
         List<Node> childNodes = element.childNodes();
         childNodes.forEach(childNode -> {
             switch (childNode) {
-                case Element innerListEl when element.tag().equals("li") -> {
+                case Element innerListEl when element.tagName().equals("li") -> {
                     StringBuilder innerLiContent = new StringBuilder();
                     writeInnerContent(innerLiContent, innerListEl);
                     content.append("*").append(innerLiContent).append("\n");
