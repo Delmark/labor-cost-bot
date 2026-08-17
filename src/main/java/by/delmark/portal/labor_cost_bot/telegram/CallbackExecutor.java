@@ -1,7 +1,10 @@
 package by.delmark.portal.labor_cost_bot.telegram;
 
+import by.delmark.portal.labor_cost_bot.telegram.callbacks.ArticleCallbacks;
 import by.delmark.portal.labor_cost_bot.telegram.callbacks.DayLaborCostCallbacks;
-import by.delmark.portal.labor_cost_bot.telegram.service.DayFillingService;
+import by.delmark.portal.labor_cost_bot.telegram.callbacks.SystemCallbacks;
+import by.delmark.portal.labor_cost_bot.telegram.service.ArticleFeedService;
+import by.delmark.portal.labor_cost_bot.telegram.service.LaborCostFillingService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.message.MaybeInaccessibleMessage;
@@ -17,7 +20,8 @@ public class CallbackExecutor {
 
     private final TelegramBot bot;
     private final MessageCommandExecutor messageCommandExecutor;
-    private final DayFillingService dayFillingService;
+    private final LaborCostFillingService laborCostFillingService;
+    private final ArticleFeedService articleFeedService;
 
     public void handleCallback(CallbackQuery callbackQuery) {
         String toast;
@@ -41,30 +45,58 @@ public class CallbackExecutor {
         if (data == null || message == null) {
             return null;
         }
+        // переделать в стратегию?
+        String cbPrefix = data.split("-")[0];
+        switch (cbPrefix) {
+            case DayLaborCostCallbacks.PREFIX -> {
+                return handleLCCallback(data, message);
+            }
+            case ArticleCallbacks.PREFIX -> {
+                return handleArticleCallback(data, message);
+            }
+            case SystemCallbacks.PREFIX -> {
+                return handleSystemCallback(data, message);
+            }
+            default -> {
+                return null;
+            }
+        }
+
+    }
+
+
+    private String handleLCCallback(String data, MaybeInaccessibleMessage message) {
         Long chatId = message.chat().id();
         Integer messageId = message.messageId();
-
         if (DayLaborCostCallbacks.INFO.equals(data)) {
             messageCommandExecutor.sendInfo(chatId);
             return null;
         }
         if (DayLaborCostCallbacks.FILL.equals(data)) {
-            return dayFillingService.enter(chatId, messageId);
+            return laborCostFillingService.enter(chatId, messageId);
         }
         if (data.startsWith(DayLaborCostCallbacks.SET_PREFIX)) {
-            return dayFillingService.setPercent(chatId, messageId, data);
+            return laborCostFillingService.setPercent(chatId, messageId, data);
         }
         if (DayLaborCostCallbacks.NAV_PREV.equals(data)) {
-            return dayFillingService.navigate(chatId, messageId, -1);
+            return laborCostFillingService.navigate(chatId, messageId, -1);
         }
         if (DayLaborCostCallbacks.NAV_NEXT.equals(data)) {
-            return dayFillingService.navigate(chatId, messageId, 1);
+            return laborCostFillingService.navigate(chatId, messageId, 1);
         }
         if (DayLaborCostCallbacks.EXIT.equals(data)) {
-            String toast = dayFillingService.leave(chatId);
+            String toast = laborCostFillingService.leave(chatId);
             messageCommandExecutor.editToInfo(chatId, messageId);
             return toast;
         }
+        return null;
+    }
+
+    private String handleArticleCallback(String data, MaybeInaccessibleMessage message) {
+        return null;
+    }
+
+    private String handleSystemCallback(String data, MaybeInaccessibleMessage message) {
         return null;
     }
 }

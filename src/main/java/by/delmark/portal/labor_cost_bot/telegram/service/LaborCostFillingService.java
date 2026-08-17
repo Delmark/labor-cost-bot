@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DayFillingService {
+public class LaborCostFillingService {
 
     private static final int[] PRESETS = {1, 5, 25, 50};
     private static final Locale RU = Locale.of("ru");
