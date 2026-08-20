@@ -20,11 +20,17 @@ import java.util.UUID;
 public class ArticleFeedRequest {
     @Builder.Default
     List<UUID> authorExternalIdList = new ArrayList<>();
+
     Integer pageNumber;
-    Integer pageSize;
+
+    @Builder.Default
+    Integer pageSize = 5;
+
     SortBy sort;
+
     @Builder.Default
     List<UUID> tagExternalIdList = new ArrayList<>();
+
     @Builder.Default
     List<String> typeList = new ArrayList<>();
 }

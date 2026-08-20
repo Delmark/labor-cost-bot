@@ -9,4 +9,7 @@ public class ArticleCallbacks {
 
     // prefix-feed:page
     public final String ARTICLE_FEED = SEPARATED_PREFIX + "article_feed:";
+
+    // refix-feed:article-internal-id
+    public final String FULL_ARTICLE = SEPARATED_PREFIX + "article:";
 }
