@@ -4,8 +4,9 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class ArticleCallbacks {
-    public final String PREFIX = "ac-";
+    public final String PREFIX = "ac";
+    public static final String SEPARATED_PREFIX = PREFIX + "-";
 
     // prefix-feed:page
-    public final String ARTICLE_FEED = PREFIX + "article_feed:";
+    public final String ARTICLE_FEED = SEPARATED_PREFIX + "article_feed:";
 }

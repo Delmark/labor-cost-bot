@@ -9,10 +9,8 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
 import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
-import com.pengrad.telegrambot.model.request.richmessages.InputRichMessage;
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.request.richmessages.SendRichMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -67,17 +65,18 @@ public class MessageCommandExecutor {
                     Команда настроек: /settings
                     """;
             long chatId = message.chat().id();
+
             SendMessage messageRequest = new SendMessage(chatId, responseText)
-                    .replyMarkup(new InlineKeyboardMarkup(
-                            new InlineKeyboardButton("Информация по трудозатратам")
-                                    .callbackData(DayLaborCostCallbacks.INFO),
-                            new InlineKeyboardButton("Просмотр стены")
-                                    .callbackData(ArticleCallbacks.ARTICLE_FEED),
-                            new InlineKeyboardButton("Настройки")
-                                    .callbackData(SystemCallbacks.SETTINGS))
-                    );
+                    .replyMarkup(buildHelpKeyboard());
             bot.execute(messageRequest);
         };
+    }
+
+    private InlineKeyboardMarkup buildHelpKeyboard() {
+        return new InlineKeyboardMarkup()
+                .addRow(new InlineKeyboardButton("Информация по трудозатратам").callbackData(DayLaborCostCallbacks.INFO))
+                .addRow(new InlineKeyboardButton("Просмотр стены").callbackData(ArticleCallbacks.ARTICLE_FEED))
+                .addRow(new InlineKeyboardButton("Настройки").callbackData(SystemCallbacks.SETTINGS));
     }
 
     private Consumer<Message> infoCommand() {

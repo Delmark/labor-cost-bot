@@ -4,7 +4,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class SystemCallbacks {
-    public final String PREFIX = "sys-";
+    public final String PREFIX = "sys";
+    public static final String SEPARATED_PREFIX = PREFIX + "-";
 
-    public final String SETTINGS = PREFIX + "settings";
+    public final String SETTINGS = SEPARATED_PREFIX + "settings";
 }
