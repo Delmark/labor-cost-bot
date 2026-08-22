@@ -12,4 +12,6 @@ public class ArticleCallbacks {
 
     // refix-feed:article-internal-id
     public final String FULL_ARTICLE = SEPARATED_PREFIX + "article:";
+
+    public final String EXIT_FEED = SEPARATED_PREFIX + "exit";
 }
