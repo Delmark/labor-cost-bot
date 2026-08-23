@@ -33,7 +33,9 @@ public class CacheStorage {
 
     public <T> T getExternalId(String cacheName, int hash) {
         return Optional.ofNullable(cacheManager.getCache(cacheName))
-                .map(cache -> (T) cache.get(hash))
+                .map(cache -> cache.get(hash))
+                .map(Cache.ValueWrapper::get)
+                .map(value -> (T) value)
                 .orElse(null);
     }
 }

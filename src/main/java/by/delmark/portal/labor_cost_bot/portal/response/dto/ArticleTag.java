@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -13,5 +14,5 @@ public class ArticleTag {
     UUID externalId;
     String name;
     Boolean isReadyForDeletion;
-    OffsetDateTime lastModifiedDate;
+    LocalDate lastModifiedDate;
 }

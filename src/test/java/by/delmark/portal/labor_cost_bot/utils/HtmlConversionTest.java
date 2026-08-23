@@ -22,12 +22,20 @@ class HtmlConversionTest {
         ) {
             return Stream.of(
                     // input, expected
-                    Arguments.arguments("<p>Hello World!</p>", "\nHello World!"),
-                    Arguments.arguments("<p>Hello <em>World!</em></p>", "\nHello _World!_"),
-                    Arguments.arguments("<h1>Title 1</h><p>Hello <em>World!</em></p>", "\n# Title 1\nHello _World!_"),
+                    Arguments.arguments("<p>Hello World!</p>", "Hello World!"),
+                    Arguments.arguments("<p>Hello <em>World!</em></p>", "Hello _World!_"),
+                    Arguments.arguments("<h1>Title 1</h><p>Hello <em>World!</em></p>", "# Title 1\n\nHello _World!_"),
                     Arguments.arguments("<img src=\"http://test\"></img>", "![](http://test)"),
                     Arguments.arguments("<a href=\"http://test\">", "[](http://test)"),
-                    Arguments.arguments("<a href=\"http://test/\">test text</a>", "[test text](http://test/)")
+                    Arguments.arguments("<a href=\"http://test/\">test text</a>", "[test text](http://test/)"),
+                    Arguments.arguments(
+                            "<img src=\"https://example.com/image.png\"><p>Intro</p><p>Quote:</p><blockquote>Text</blockquote><p>After</p>",
+                            "![](https://example.com/image.png)\n\nIntro\n\nQuote:\n\n> Text\n\nAfter"
+                    ),
+                    Arguments.arguments(
+                            "<ol><li><p>First</p></li><li><p>Second</p></li></ol><ul><li><p>One</p></li><li><p>Two</p></li></ul>",
+                            "1. First\n2. Second\n\n* One\n* Two"
+                    )
             );
         }
     }

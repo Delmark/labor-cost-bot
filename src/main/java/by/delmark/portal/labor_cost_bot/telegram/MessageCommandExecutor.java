@@ -75,7 +75,7 @@ public class MessageCommandExecutor {
     private InlineKeyboardMarkup buildHelpKeyboard() {
         return new InlineKeyboardMarkup()
                 .addRow(new InlineKeyboardButton("Информация по трудозатратам").callbackData(DayLaborCostCallbacks.INFO))
-                .addRow(new InlineKeyboardButton("Просмотр стены").callbackData(ArticleCallbacks.ARTICLE_FEED))
+                .addRow(new InlineKeyboardButton("Просмотр стены").callbackData(ArticleCallbacks.ARTICLE_FEED + 0))
                 .addRow(new InlineKeyboardButton("Настройки").callbackData(SystemCallbacks.SETTINGS));
     }
 

@@ -10,7 +10,10 @@ import org.jsoup.nodes.TextNode;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static by.delmark.portal.labor_cost_bot.telegram.utils.HtmlToRichMessageConverter.convertTagToMarkdown;
 
 @Getter
 @RequiredArgsConstructor
@@ -39,7 +42,7 @@ public enum HtmlTagMappingRegistry {
     UNDERSCORE("u", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
-        return "<u>" + content + "</u>"; // почти ничего не поменялось
+        return "<u>" + content + "</u>";
     }),
 
     ORDERED_LIST("ol", (element) -> {
@@ -47,47 +50,18 @@ public enum HtmlTagMappingRegistry {
         StringBuilder content = new StringBuilder();
 
         List<Node> childNodes = element.childNodes();
-        childNodes.forEach(childNode -> {
-            switch (childNode) {
-                case Element innerListEl when element.tagName().equals("li") -> {
-                    String elementOrder = order.incrementAndGet() + ". ";
-                    StringBuilder innerLiContent = new StringBuilder();
-                    writeInnerContent(innerLiContent, innerListEl);
-                    content.append(elementOrder).append(innerLiContent).append("\n");
-                }
-                case Element innerElement -> content.append(
-                        HtmlToRichMessageConverter
-                                .convertTagToMarkdown(innerElement)
-                );
-                case TextNode textNode -> content.append(textNode.text());
-                default -> {}
-            }
-        });
+        childNodes.forEach(childNode -> writeListItemContent(content, childNode, () -> order.incrementAndGet() + ". "));
 
-        return content.toString();
+        return asBlock(content.toString());
     }),
 
     UNORDERED_LIST("ul", (element) -> {
         StringBuilder content = new StringBuilder();
 
         List<Node> childNodes = element.childNodes();
-        childNodes.forEach(childNode -> {
-            switch (childNode) {
-                case Element innerListEl when element.tagName().equals("li") -> {
-                    StringBuilder innerLiContent = new StringBuilder();
-                    writeInnerContent(innerLiContent, innerListEl);
-                    content.append("*").append(innerLiContent).append("\n");
-                }
-                case Element innerElement -> content.append(
-                        HtmlToRichMessageConverter
-                                .convertTagToMarkdown(innerElement)
-                );
-                case TextNode textNode -> content.append(textNode.text());
-                default -> {}
-            }
-        });
+        childNodes.forEach(childNode -> writeListItemContent(content, childNode, () -> "* "));
 
-        return content.toString();
+        return asBlock(content.toString());
     }),
 
     STRIKETHROUGH("s", (element) -> {
@@ -99,16 +73,17 @@ public enum HtmlTagMappingRegistry {
     QUOTE("blockquote", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
-        return content
-                .toString()
-                .lines()
+        String quote = content.toString().strip();
+        return asBlock(
+                quote.lines()
                 .map(s -> (s.isBlank()) ? ">" : "> " + s)
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.joining("\n"))
+        );
     }),
 
     IMAGE("img", (element) -> {
-        String imageSource = element.attr("src");
-        return "![](" + imageSource + ")";
+        String imageSource = element.attr("src").strip();
+        return imageSource.isEmpty() ? "" : asBlock("![](" + imageSource + ")");
     }),
 
     HEADING("h[1-6]", (element) -> {
@@ -116,16 +91,13 @@ public enum HtmlTagMappingRegistry {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
         String headerFill = Strings.repeat("#", headerLevel);
-        return "\n" + headerFill + " " + content;
+        return asBlock(headerFill + " " + content);
     }),
 
     PARAGRAPH("p", (element) -> {
         StringBuilder content = new StringBuilder();
         writeInnerContent(content, element);
-        if (content.isEmpty()) {
-            return "";
-        }
-        return "\n" + content;
+        return asBlock(content.toString());
     }),;
 
     private final String htmlTag;
@@ -135,10 +107,48 @@ public enum HtmlTagMappingRegistry {
         List<Node> childNodes = element.childNodes();
         childNodes.forEach(childNode -> {
             switch (childNode) {
-                case Element innerElement -> content.append(HtmlToRichMessageConverter.convertTagToMarkdown(innerElement));
+                case Element innerElement -> content.append(convertTagToMarkdown(innerElement));
                 case TextNode textNode -> content.append(textNode.text());
                 default -> {}
             }
         });
+    }
+
+    private static void writeListItemContent(StringBuilder content, Node itemNode, Supplier<String> markerSupplier) {
+        switch (itemNode) {
+            case Element innerListEl when innerListEl.tagName().equals("li") -> {
+                String elementMarker = markerSupplier.get();
+                StringBuilder innerLiContent = new StringBuilder();
+                writeListItemInnerContent(innerLiContent, innerListEl);
+                content.append(elementMarker).append(innerLiContent.toString().strip()).append("\n");
+            }
+            case Element innerElement -> content.append(convertTagToMarkdown(innerElement));
+            case TextNode textNode -> content.append(textNode.text());
+            default -> {}
+        }
+    }
+
+    private static void writeListItemInnerContent(StringBuilder content, Element listItem) {
+        List<Node> childNodes = listItem.childNodes();
+        childNodes.forEach(childNode -> {
+            switch (childNode) {
+                case Element innerElement -> {
+                    String convertedElement = convertTagToMarkdown(innerElement);
+                    if (!convertedElement.isBlank()) {
+                        if (innerElement.tagName().equals("p") && !content.isEmpty()) {
+                            content.append("\n");
+                        }
+                        content.append(convertedElement.strip());
+                    }
+                }
+                case TextNode textNode -> content.append(textNode.text());
+                default -> {}
+            }
+        });
+    }
+
+    private static String asBlock(String content) {
+        String normalizedContent = content.strip();
+        return normalizedContent.isEmpty() ? "" : "\n\n" + normalizedContent + "\n\n";
     }
 }

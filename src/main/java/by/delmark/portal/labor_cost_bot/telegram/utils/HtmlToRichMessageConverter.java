@@ -31,10 +31,15 @@ public class HtmlToRichMessageConverter {
 
         StringBuilder markdown = new StringBuilder();
 
-        allElements.iterator()
-                .forEachRemaining(element ->
-                        markdown.append(convertTagToMarkdown(element))
-                );
+        allElements.forEach(element -> {
+            String convertedElement = convertTagToMarkdown(element);
+            if (StringUtils.hasText(convertedElement)) {
+                if (!markdown.isEmpty()) {
+                    markdown.append("\n\n");
+                }
+                markdown.append(convertedElement.strip());
+            }
+        });
 
         return markdown.toString();
     }

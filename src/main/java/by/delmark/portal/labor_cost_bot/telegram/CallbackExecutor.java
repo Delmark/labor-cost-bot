@@ -92,6 +92,14 @@ public class CallbackExecutor {
     }
 
     private String handleArticleCallback(String data, MaybeInaccessibleMessage message) {
+        Long chatId = message.chat().id();
+        Integer messageId = message.messageId();
+        if (data.startsWith(ArticleCallbacks.ARTICLE_FEED)) {
+            return articleFeedService.showArticleFeed(chatId, messageId, data);
+        }
+        if (data.startsWith(ArticleCallbacks.FULL_ARTICLE)) {
+            return articleFeedService.showFullArticle(chatId, messageId, data);
+        }
         return null;
     }
 

@@ -14,7 +14,9 @@ import com.pengrad.telegrambot.model.request.richmessages.InputRichMessage;
 import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.richmessages.SendRichMessage;
+import com.pengrad.telegrambot.response.BaseResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -26,6 +28,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ArticleFeedService {
 
     private final TelegramBot bot;
@@ -71,12 +74,12 @@ public class ArticleFeedService {
             int articleIdHash = cacheStorage.putExternalIdIfAbsent(EXT_ID_CACHE, article.getExternalId());
             String callbackData = ArticleCallbacks.FULL_ARTICLE + articleIdHash;
             responseKeyboard.addRow(
-                    new InlineKeyboardButton(article.getName(), callbackData)
+                    new InlineKeyboardButton(article.getName()).callbackData(callbackData)
             );
         }
         responseKeyboard.addRow(
-                new InlineKeyboardButton("<-", ArticleCallbacks.ARTICLE_FEED + (page - 1)),
-                new InlineKeyboardButton("->", ArticleCallbacks.ARTICLE_FEED + (page + 1))
+                new InlineKeyboardButton("<-").callbackData(ArticleCallbacks.ARTICLE_FEED + (page - 1)),
+                new InlineKeyboardButton("->").callbackData(ArticleCallbacks.ARTICLE_FEED + (page + 1))
         );
 
         String message = "~~~ Страница %d ~~~ \n\n\n %s".formatted(page + 1, responseArticles);
@@ -99,12 +102,8 @@ public class ArticleFeedService {
         if (richMessageConvertedText.length() > LENGTH_LIMIT) {
             chunkAndSendMultipleMessages(richMessageConvertedText, chatId);
         } else {
-            EditMessageText editMessageText = new EditMessageText(
-                    chatId, messageId,
-                    new InputRichMessage()
-                            .markdown(richMessageConvertedText)
-            );
-            bot.execute(editMessageText);
+            SendRichMessage messageReq = new SendRichMessage(chatId, new InputRichMessage().markdown(richMessageConvertedText));
+            BaseResponse response = bot.execute(messageReq);
         }
         return null;
     }

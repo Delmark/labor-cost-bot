@@ -26,13 +26,14 @@ public class ArticleFeedRequest {
     @Builder.Default
     Integer pageSize = 5;
 
-    SortBy sort;
+    @Builder.Default
+    SortBy sort = SortBy.CREATED_DESC;
 
     @Builder.Default
     List<UUID> tagExternalIdList = new ArrayList<>();
 
     @Builder.Default
-    List<String> typeList = new ArrayList<>();
+    List<String> typeList = List.of("NEWS", "FLOOD");
 }
 
 
