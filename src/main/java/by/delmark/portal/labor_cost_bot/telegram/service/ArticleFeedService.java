@@ -41,6 +41,7 @@ public class ArticleFeedService {
     // TODO: в будущем добавить возможность настроить зону
     private static final ZoneId DEFAULT_ZONE = ZoneId.of("Europe/Moscow");
     private static final DateTimeFormatter articleCreatedAtFormatter = DateTimeFormatter.ofPattern("MM.dd HH:mm:ss");
+    private final HtmlToRichMessageConverter htmlToRichMessageConverter;
 
     public String showArticleFeed(Long chatId, Integer messageId, String data) {
         int page = Integer.parseInt(data.split(":")[1]);
@@ -98,16 +99,18 @@ public class ArticleFeedService {
             return "Не удалось получить информацию об статье";
         }
         ArticleResponse article = portalClient.getArticle(articleExternalId);
-        String richMessageConvertedText = HtmlToRichMessageConverter.convertHtmlToMarkdown(article.getHtml());
+        String richMessageConvertedText = htmlToRichMessageConverter.convertHtmlToMarkdown(article.getHtml());
         if (richMessageConvertedText.length() > LENGTH_LIMIT) {
             chunkAndSendMultipleMessages(richMessageConvertedText, chatId);
         } else {
             SendRichMessage messageReq = new SendRichMessage(chatId, new InputRichMessage().markdown(richMessageConvertedText));
             BaseResponse response = bot.execute(messageReq);
+            log.debug("{} {}", response.errorCode(), response.description());
         }
         return null;
     }
 
+    // todo: разбивать надо не по тексту, а по блокам
     private void chunkAndSendMultipleMessages(String fullMessage, Long chatId) {
         String[] chunkedRichMessage = new String[fullMessage.length() / LENGTH_LIMIT];
         for (int i = 0; i < chunkedRichMessage.length; i++) {

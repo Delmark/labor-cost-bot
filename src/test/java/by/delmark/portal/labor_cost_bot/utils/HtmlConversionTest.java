@@ -1,6 +1,7 @@
 package by.delmark.portal.labor_cost_bot.utils;
 
 import by.delmark.portal.labor_cost_bot.telegram.utils.HtmlToRichMessageConverter;
+import by.delmark.portal.labor_cost_bot.telegram.utils.Portal2TelegramImgAdapter;
 import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -43,7 +44,8 @@ class HtmlConversionTest {
     @ParameterizedTest
     @ArgumentsSource(HtmlToMarkdownArgumentsProvider.class)
     void basic_conversations(String inputHtml, String expectedMarkdown) {
-        String result = HtmlToRichMessageConverter.convertHtmlToMarkdown(inputHtml);
+        HtmlToRichMessageConverter converter = new HtmlToRichMessageConverter(new Portal2TelegramImgAdapter());
+        String result = converter.convertHtmlToMarkdown(inputHtml);
         Assertions.assertThat(result).isEqualTo(expectedMarkdown);
     }
 }

@@ -1,10 +1,13 @@
 package by.delmark.portal.labor_cost_bot.telegram.utils;
 
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
@@ -12,7 +15,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@UtilityClass
+@Slf4j
+@Component
+@RequiredArgsConstructor
 public class HtmlToRichMessageConverter {
 
     public static final Map<String, HtmlTagMappingRegistry> htmlMappingRegistry =
@@ -21,6 +26,8 @@ public class HtmlToRichMessageConverter {
                             HtmlTagMappingRegistry::getHtmlTag,
                             Function.identity()
                     ));
+
+    private final Portal2TelegramImgAdapter imgAdapter;
 
     public String convertHtmlToMarkdown(String html) {
         if (!StringUtils.hasText(html)) {
@@ -32,6 +39,10 @@ public class HtmlToRichMessageConverter {
         StringBuilder markdown = new StringBuilder();
 
         allElements.forEach(element -> {
+//            if (element.tagName().equals("img")) {
+//                String src = element.attr("src");
+//                element.attr("src", imgAdapter.adaptImageLinkForTG(src));
+//            }
             String convertedElement = convertTagToMarkdown(element);
             if (StringUtils.hasText(convertedElement)) {
                 if (!markdown.isEmpty()) {
@@ -40,11 +51,11 @@ public class HtmlToRichMessageConverter {
                 markdown.append(convertedElement.strip());
             }
         });
-
+        log.debug("{}", markdown);
         return markdown.toString();
     }
 
-    public String convertTagToMarkdown(Element element) {
+    public static String convertTagToMarkdown(Element element) {
         String tag = element.tagName();
         HtmlTagMappingRegistry tagFromRegistry;
         if (htmlMappingRegistry.containsKey(tag)) {

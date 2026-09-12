@@ -82,8 +82,9 @@ public enum HtmlTagMappingRegistry {
     }),
 
     IMAGE("img", (element) -> {
-        String imageSource = element.attr("src").strip();
-        return imageSource.isEmpty() ? "" : asBlock("![](" + imageSource + ")");
+//        String imageSource = element.attr("src").strip();
+//        return imageSource.isEmpty() ? "" : asBlock("![](" + imageSource + ")");
+        return "";
     }),
 
     HEADING("h[1-6]", (element) -> {
